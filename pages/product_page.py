@@ -7,10 +7,9 @@ from .locators import ProductPageLocators
 class ProductPage(BasePage):
     def add_product_to_basket(self) -> None:
         self.button_click(*ProductPageLocators.BTN_ADD_TO_BASKET)
-        WebDriverWait(self.browser, 20).until(EC.alert_is_present(), "---!!! ALERT NOT FOUND !!!---")
         # if "?promo=newYear" in self.browser.current_url:
         self.solve_quiz_and_get_code()
-        print(self.browser.current_url)
+        # print(self.browser.current_url)
 
     def should_be_product_in_basket_and_price_equal(self) -> None:
         WebDriverWait(self.browser, 30).until(

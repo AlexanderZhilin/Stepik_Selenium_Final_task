@@ -9,8 +9,15 @@ links = [
     "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=newYear2019"
 ]
 
+# Т.к все страницы отличаются лишь последней цифрой, то для удобства создадим генератор страниц и
+# xf - кортеж из старниц, которые падают, сюда можно дописывать номера страниц.
+# Полезно, если например подобных страниц тысячи :)
+xf = (7,)  # список страниц с падающими тестами
+lin = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer"
+links2 = [pytest.param(lin + str(i), marks=pytest.mark.xfail) if i in xf else lin + str(i) for i in range(10)]
 
-@pytest.mark.parametrize("product", links)
+
+@pytest.mark.parametrize("product", links2)
 def test_guest_can_add_product_to_basket(browser, product: str) -> None:
     link = product
     page = ProductPage(browser, link)  # инициализируем Page Object, передаем в конструктор экземпляр драйвера и url

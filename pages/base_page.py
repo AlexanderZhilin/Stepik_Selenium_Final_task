@@ -36,16 +36,17 @@ class BasePage():
                                                    "---!!! BUTTON NOT CLICKABLE !!!---").click()
 
     def solve_quiz_and_get_code(self):  # метод в тесте для получения проверочного кода. Задание 4_3 шаг 2
+        WebDriverWait(self.browser, 20).until(EC.alert_is_present(), "---!!! ALERT 1 NOT FOUND !!!---")
         alert = self.browser.switch_to.alert
         x = alert.text.split(" ")[2]
         answer = str(math.log(abs((12 * math.sin(float(x))))))
         alert.send_keys(answer)
         alert.accept()
-        WebDriverWait(self.browser, 20).until(EC.alert_is_present(), "---!!! ALERT NOT FOUND !!!---")
-        try:
-            alert = self.browser.switch_to.alert
-            alert_text = alert.text
-            print(f"Your code: {alert_text}")
-            alert.accept()
-        except NoAlertPresentException:
-            print("No second alert presented")
+        # WebDriverWait(self.browser, 20).until(EC.alert_is_present(), "---!!! ALERT 2 NOT FOUND !!!---")
+        # try:
+        #     alert = self.browser.switch_to.alert
+        #     alert_text = alert.text
+        #     print(f"Your code: {alert_text}")
+        #     alert.accept()
+        # except NoAlertPresentException:
+        #     print("No second alert presented")
