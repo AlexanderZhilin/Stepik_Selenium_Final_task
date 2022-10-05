@@ -16,3 +16,4 @@ class ProductPageLocators():
     PRICE_MAIN_PRODUCT = (By.CSS_SELECTOR, ".product_main .price_color")
     MESSAGE_ADDED_TO_BASKET = (By.CSS_SELECTOR, "#messages > :nth-child(1) strong")
     BASKET_PRICE = (By.CSS_SELECTOR, "#messages > :nth-child(3) strong")
+    SUCCESS_MESSAGE = (By.CSS_SELECTOR, ".alert-success")

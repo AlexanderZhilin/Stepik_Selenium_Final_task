@@ -1,4 +1,4 @@
-from selenium.common.exceptions import NoSuchElementException  # Чтобы импортировать нужное нам исключение
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoAlertPresentException
@@ -7,7 +7,7 @@ import math
 
 class BasePage():
 
-    def __init__(self, browser, url, timeout=20):  # Конструктор — метод, который вызывается, когда мы создаем объект
+    def __init__(self, browser, url, timeout=10):  # Конструктор — метод, который вызывается, когда мы создаем объект
         self.browser = browser  # в конструктор передаем экземпляр драйвера и url адрес
         self.url = url
         self.browser.implicitly_wait(timeout)
@@ -15,10 +15,28 @@ class BasePage():
     def open(self):
         self.browser.get(self.url)
 
-    def is_element_present(self, how, what):  # Представлен. Метод в котором будем перехватывать исключения.
+    def is_element_present(self, how, what):  # смотрм, что элемент присутствует - 0 сек
         try:
             self.browser.find_element(how, what)  # Как искать (css, id, xpath и тд) и что искать (строку-селектор)
         except (NoSuchElementException):
+            return False
+        return True
+
+    def is_not_element_present(self, how, what, timeout=4):  # ждем не появления элемента - 4 сек
+        try:
+            WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located((how, what)))
+        except TimeoutException:
+            return True
+        return False
+
+    def is_appeared(self, how, what, timeout=4):  # ждем появления элемента - 4 сек
+        pass
+
+    def is_disappeared(self, how, what, timeout=4):  # ждем исчезновения элемента - 4 сек
+        try:
+            WebDriverWait(self.browser, timeout, 1, TimeoutException).until_not(
+                EC.presence_of_element_located((how, what)))
+        except TimeoutException:
             return False
         return True
 
@@ -35,18 +53,24 @@ class BasePage():
         WebDriverWait(self.browser, timeout).until(EC.element_to_be_clickable((how, what)),
                                                    "---!!! BUTTON NOT CLICKABLE !!!---").click()
 
+    def should_be_alert_appeared(self, timeout=10):
+        try:
+            WebDriverWait(self.browser, timeout).until(EC.alert_is_present(), "alert_not_appeared")
+        except TimeoutException:
+            return False
+        return True
+
     def solve_quiz_and_get_code(self):  # метод в тесте для получения проверочного кода. Задание 4_3 шаг 2
-        WebDriverWait(self.browser, 20).until(EC.alert_is_present(), "---!!! ALERT 1 NOT FOUND !!!---")
         alert = self.browser.switch_to.alert
         x = alert.text.split(" ")[2]
         answer = str(math.log(abs((12 * math.sin(float(x))))))
         alert.send_keys(answer)
         alert.accept()
-        # WebDriverWait(self.browser, 20).until(EC.alert_is_present(), "---!!! ALERT 2 NOT FOUND !!!---")
-        # try:
-        #     alert = self.browser.switch_to.alert
-        #     alert_text = alert.text
-        #     print(f"Your code: {alert_text}")
-        #     alert.accept()
-        # except NoAlertPresentException:
-        #     print("No second alert presented")
+        if self.should_be_alert_appeared():
+            try:
+                alert = self.browser.switch_to.alert
+                alert_text = alert.text
+                print(f"Your code: {alert_text}")
+                alert.accept()
+            except NoAlertPresentException:
+                print("No second alert presented")
