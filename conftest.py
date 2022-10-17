@@ -26,9 +26,9 @@ def browser(request):
     if browser_name == "chrome":
         print(f"\nstart chrome browser for test with {user_language}..")
         options = Options()
+        # options.add_argument("window-size=1920,1040")
         options.add_experimental_option('prefs', {'intl.accept_languages': user_language})
         # options.add_argument("--headless") # 1) отключить окна
-        # browser = webdriver.Chrome(options=options) # 1) отключить окна
         browser = webdriver.Chrome(options=options)  # 2) включить просмотр окон
     elif browser_name == "firefox":
         print(f"\nstart firefox browser for test with {user_language}..")

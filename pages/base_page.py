@@ -3,17 +3,29 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoAlertPresentException
 import math
+from .locators import BasePageLocators
 
 
 class BasePage():
 
-    def __init__(self, browser, url, timeout=10):  # Конструктор — метод, который вызывается, когда мы создаем объект
+    def __init__(self, browser, url, timeout=20):  # Конструктор — метод, который вызывается, когда мы создаем объект
         self.browser = browser  # в конструктор передаем экземпляр драйвера и url адрес
         self.url = url
         self.browser.implicitly_wait(timeout)
 
     def open(self):
         self.browser.get(self.url)
+
+    def go_to_login_page(self):
+        link = self.browser.find_element(*BasePageLocators.LOGIN_LINK)
+        link.click()
+        # alert = self.browser.switch_to.alert # 1) перейти на всплывающее окно
+        # alert.accept() #1) принять всплывающее окно
+        # time.sleep(5)
+
+    def should_be_login_link(self):
+        assert self.is_element_present(*BasePageLocators.LOGIN_LINK), "Login link is not presented"
+        # где *BasePageLocators.LOGIN_LINK это By.CSS_SELECTOR, "#login_link" из locators.py
 
     def is_element_present(self, how, what):  # смотрм, что элемент присутствует - 0 сек
         try:
