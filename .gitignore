@@ -1,0 +1,9 @@
+PyTest_env
+.idea
+.gitignore
+test_test.py
+.pytest_cache
+__pycache__
+*.log
+HWM_test.py
+captcha.txt
