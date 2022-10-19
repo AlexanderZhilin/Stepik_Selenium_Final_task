@@ -13,8 +13,11 @@ class BasePage():
         self.url = url
         self.browser.implicitly_wait(timeout)
 
-    def open(self):
-        self.browser.get(self.url)
+    def button_click(self, how, what, timeout=10):  # кнопка найдена, кликабельна, клик
+        WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located((how, what)),
+                                                   "---!!! BUTTON NOT FOUND !!!---")
+        WebDriverWait(self.browser, timeout).until(EC.element_to_be_clickable((how, what)),
+                                                   "---!!! BUTTON NOT CLICKABLE !!!---").click()
 
     def go_to_basket_page(self):
         link = self.browser.find_element(*BasePageLocators.BASKET_LINK)
@@ -26,24 +29,6 @@ class BasePage():
         # alert = self.browser.switch_to.alert # 1) перейти на всплывающее окно
         # alert.accept() #1) принять всплывающее окно
         # time.sleep(5)
-
-    def should_be_login_link(self):
-        assert self.is_element_present(*BasePageLocators.LOGIN_LINK), "Login link is not presented"
-        # где *BasePageLocators.LOGIN_LINK это By.CSS_SELECTOR, "#login_link" из locators.py
-
-    def is_element_present(self, how, what):  # смотрм, что элемент присутствует - 0 сек
-        try:
-            self.browser.find_element(how, what)  # Как искать (css, id, xpath и тд) и что искать (строку-селектор)
-        except NoSuchElementException:
-            return False
-        return True
-
-    def is_not_element_present(self, how, what, timeout=4):  # ждем не появления элемента - 4 сек
-        try:
-            WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located((how, what)))
-        except TimeoutException:
-            return True
-        return False
 
     def is_appeared(self, how, what, timeout=4):  # ждем появления элемента - 4 сек
         try:
@@ -60,6 +45,20 @@ class BasePage():
         except TimeoutException:
             return False
         return True
+
+    def is_element_present(self, how, what):  # смотрм, что элемент присутствует - 0 сек
+        try:
+            self.browser.find_element(how, what)  # Как искать (css, id, xpath и тд) и что искать (строку-селектор)
+        except NoSuchElementException:
+            return False
+        return True
+
+    def is_not_element_present(self, how, what, timeout=4):  # ждем не появления элемента - 4 сек
+        try:
+            WebDriverWait(self.browser, timeout).until(EC.presence_of_element_located((how, what)))
+        except TimeoutException:
+            return True
+        return False
 
     def is_text_equal(self, equal):  # Локатор 1 - assert сообщение , локатор 2 - assert сообщение
         assert self.is_element_present(*equal[0]), equal[1]
@@ -79,12 +78,8 @@ class BasePage():
         except NoSuchElementException:
             return False
 
-    def button_click(self, how, what, timeout=10):  # кнопка найдена, кликабельна, клик
-        WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located((how, what)),
-                                                   "---!!! BUTTON NOT FOUND !!!---")
-        WebDriverWait(self.browser, timeout).until(EC.element_to_be_clickable((how, what)),
-                                                   "---!!! BUTTON NOT CLICKABLE !!!---").click()
-        # self.browser.find_element(how, what).click()
+    def open(self):
+        self.browser.get(self.url)
 
     def should_be_alert_appeared(self, timeout=10):
         try:
@@ -92,6 +87,14 @@ class BasePage():
         except TimeoutException:
             return False
         return True
+
+    def should_be_authorized_user(self):
+        assert self.is_element_present(*BasePageLocators.USER_ICON), "User icon is not presented," \
+                                                                     " probably unauthorised user"
+
+    def should_be_login_link(self):
+        assert self.is_element_present(*BasePageLocators.LOGIN_LINK), "Login link is not presented"
+        # где *BasePageLocators.LOGIN_LINK это By.CSS_SELECTOR, "#login_link" из locators.py
 
     def solve_quiz_and_get_code(self):  # метод в тесте для получения проверочного кода. Задание 4_3 шаг 2
         alert = self.browser.switch_to.alert
@@ -107,7 +110,3 @@ class BasePage():
                 alert.accept()
             except NoAlertPresentException:
                 print("No second alert presented")
-
-    def should_be_authorized_user(self):
-        assert self.is_element_present(*BasePageLocators.USER_ICON), "User icon is not presented," \
-                                                                     " probably unauthorised user"
