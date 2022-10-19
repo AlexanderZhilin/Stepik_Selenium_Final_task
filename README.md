@@ -21,7 +21,7 @@ These instructions will get you a copy of the project up and running on your loc
 git clone https://github.com/AlexanderZhilin/Stepik_Selenium_Final_task.git
 cd Stepik_Selenium_Final_task
 python -m venv PyTest_env
-PyTest_env\Scripts\activate.bat (for Windows)     or    source PyTest_env/bin/activate (for Linux и MacOS)
+PyTest_env\Scripts\activate.bat (for Windows)     or    source PyTest_env/bin/activate (for Linux and MacOS)
 pip install -r requirements.txt
 ```
 ## Running tests
