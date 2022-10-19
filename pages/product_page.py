@@ -12,7 +12,9 @@ class ProductPage(BasePage):
         if self.should_be_alert_appeared():
             self.solve_quiz_and_get_code()
 
-    def should_be_product_in_basket_and_price_equal(self) -> None:  # should - должно
+    def should_be_product_in_basket_and_price_equal(self) -> None:
+        """ Должен быть товар в корзине и цена соответствующая """
+
         WebDriverWait(self.browser, 30).until(
             EC.visibility_of_element_located(ProductPageLocators.MESSAGE_ADDED_TO_BASKET),
             'Message "added to basket" did not appear')
@@ -25,10 +27,14 @@ class ProductPage(BasePage):
         for equal in equality:
             self.is_text_equal(equal)
 
-    def should_not_be_success_message(self):  # Должно не быть успешное сообщение
+    def should_not_be_success_message(self):
+        """ Должно не быть успешное сообщение """
+
         assert self.is_not_element_present(
             *ProductPageLocators.SUCCESS_MESSAGE), "Success message is presented, but should not be"
 
-    def should_disappeared_success_message(self):  # Должно исчезнуть успешное сообщение
+    def should_disappeared_success_message(self):
+        """ Должно исчезнуть сообщение об успехе """
+
         assert self.is_disappeared(
             *ProductPageLocators.SUCCESS_MESSAGE), "Success message does not disappear, but should have disappeared"

@@ -8,13 +8,17 @@ from .locators import BasePageLocators
 
 class BasePage():
 
-    def __init__(self, browser, url, timeout=20):  # Конструктор — метод, который вызывается, когда мы создаем объект
+    def __init__(self, browser, url, timeout=4):  # Конструктор — метод, который вызывается, когда мы создаем объект
         self.browser = browser  # в конструктор передаем экземпляр драйвера и url адрес
         self.url = url
         self.browser.implicitly_wait(timeout)
 
     def open(self):
         self.browser.get(self.url)
+
+    def go_to_basket_page(self):
+        link = self.browser.find_element(*BasePageLocators.BASKET_LINK)
+        link.click()
 
     def go_to_login_page(self):
         link = self.browser.find_element(*BasePageLocators.LOGIN_LINK)
@@ -30,7 +34,7 @@ class BasePage():
     def is_element_present(self, how, what):  # смотрм, что элемент присутствует - 0 сек
         try:
             self.browser.find_element(how, what)  # Как искать (css, id, xpath и тд) и что искать (строку-селектор)
-        except (NoSuchElementException):
+        except NoSuchElementException:
             return False
         return True
 
@@ -58,6 +62,15 @@ class BasePage():
         first_element = self.browser.find_element(*equal[0]).text
         second_element = self.browser.find_element(*equal[2]).text
         assert first_element == second_element, f'Text are not equal: "{first_element}" - "{second_element}"'
+
+    def my_text_is_in_text(self, how, what, my_text):
+        try:
+            if my_text in self.browser.find_element(how, what).text:
+                return True
+            else:
+                return False
+        except NoSuchElementException:
+            return False
 
     def button_click(self, how, what, timeout=10):  # кнопка найдена, кликабельна, клик
         WebDriverWait(self.browser, timeout).until(EC.visibility_of_element_located((how, what)),
