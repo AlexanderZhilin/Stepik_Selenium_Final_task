@@ -46,7 +46,12 @@ class BasePage():
         return False
 
     def is_appeared(self, how, what, timeout=4):  # ждем появления элемента - 4 сек
-        pass
+        try:
+            WebDriverWait(self.browser, timeout, 1, TimeoutException).until(
+                EC.visibility_of_element_located((how, what)))
+        except TimeoutException:
+            return False
+        return True
 
     def is_disappeared(self, how, what, timeout=4):  # ждем исчезновения элемента - 4 сек
         try:
@@ -63,10 +68,12 @@ class BasePage():
         second_element = self.browser.find_element(*equal[2]).text
         assert first_element == second_element, f'Text are not equal: "{first_element}" - "{second_element}"'
 
-    def my_text_is_in_text(self, how, what, my_text):
+    def my_text_is_in_text(self, how, what, my_text: tuple):
+        """ Принимает список True фраз, и проверяет, что хотя бы одна фраза есть в найденном тексте """
         try:
-            if my_text in self.browser.find_element(how, what).text:
-                return True
+            for text in my_text:
+                if text in self.browser.find_element(how, what).text:
+                    return True
             else:
                 return False
         except NoSuchElementException:
@@ -77,6 +84,7 @@ class BasePage():
                                                    "---!!! BUTTON NOT FOUND !!!---")
         WebDriverWait(self.browser, timeout).until(EC.element_to_be_clickable((how, what)),
                                                    "---!!! BUTTON NOT CLICKABLE !!!---").click()
+        # self.browser.find_element(how, what).click()
 
     def should_be_alert_appeared(self, timeout=10):
         try:
@@ -99,3 +107,7 @@ class BasePage():
                 alert.accept()
             except NoAlertPresentException:
                 print("No second alert presented")
+
+    def should_be_authorized_user(self):
+        assert self.is_element_present(*BasePageLocators.USER_ICON), "User icon is not presented," \
+                                                                     " probably unauthorised user"

@@ -1,9 +1,14 @@
-from pages.login_page import LoginPage
+from .pages.login_page import LoginPage
 from .pages.product_page import ProductPage
 from .pages.basket_page import BasketPage
 import pytest
+import time
 
 # pip install pytest-rerunfailures # -плагин для перезапуска упавших тестов
+# Для запуска тестов из командной строки:
+# cd C:\Users\Александр\PyProject\Python Обучение\Stepik_Selenium\Stepik_Selenium_Final_task
+# PyTest_env\Scripts\activate.bat
+# pytest -v -s --tb=line -m login_user --reruns 3 --language=ru --browser_name=chrome test_product_page.py
 
 links = [
     "http://selenium1py.pythonanywhere.com/catalogue/the-shellcoders-handbook_209/?promo=newYear",
@@ -89,3 +94,31 @@ def test_guest_cant_see_product_in_basket_opened_from_product_page(browser) -> N
     basket_page.should_be_basket_page()
     basket_page.should_not_appeared_product_in_basket()
     basket_page.should_appeared_text_basket_is_empty()
+
+
+@pytest.mark.login_user
+class TestUserAddToBasketFromProductPage():
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self, browser):
+        link = 'http://selenium1py.pythonanywhere.com/ru/accounts/login/'  # -ссылка на LoginPage
+        page = LoginPage(browser, link)  # инициализируем Page Object, передаем экземпляр драйвера и url адрес
+        page.open()  # открываем страницу
+        email = str(time.time()) + '@fakemail.org'
+        password = str(time.time()) + 'Tpj-xhh-k4M-6ar'
+        page.register_new_user(email, password)
+        page.should_be_authorized_user()
+
+    def test_user_can_add_product_to_basket(self, browser) -> None:
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
+        page = ProductPage(browser, link)
+        page.open()
+        page.add_product_to_basket()
+        page.should_be_product_in_basket_and_price_equal()
+
+    def test_user_cant_see_success_message(self, browser) -> None:
+        """ Пользователь не может видеть сообщение об успехе. Ждем появления <= 4 сек  """
+
+        link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207"
+        page = ProductPage(browser, link)
+        page.open()
+        page.should_not_be_success_message()
